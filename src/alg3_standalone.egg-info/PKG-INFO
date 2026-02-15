@@ -1,0 +1,33 @@
+Metadata-Version: 2.4
+Name: alg3-standalone
+Version: 0.1.0
+Summary: Standalone Alg3 MCMC extracted from section2.4.1
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: numpy>=1.24
+Requires-Dist: scipy>=1.10
+Requires-Dist: matplotlib>=3.7
+Provides-Extra: accel
+Requires-Dist: numba>=0.59; extra == "accel"
+
+# alg3_standalone
+
+`section2.4.1_st_v3.ipynb`에서 사용한 Alg3 MCMC 코드를 독립 실행 가능 형태로 복사한 폴더입니다.
+
+## Included
+
+- `src/alg3/inference.py`: Alg3/Alg4 MCMC core
+- `src/alg3/modeling.py`: covariance/data helper
+- `src/alg3/clr_fallback.py`: CLR fallback functions
+- `data/data_st.npz`: smoke test용 데이터 복사본
+- `scripts/run_alg3_smoke.py`: 최소 실행 검증 스크립트
+
+## Quick start
+
+```bash
+cd alg3_standalone
+python -m pip install -e .
+python scripts/run_alg3_smoke.py
+```
+
+`numba`가 있으면 가속 가능하며, 없으면 pure Python 경로로 동작합니다.

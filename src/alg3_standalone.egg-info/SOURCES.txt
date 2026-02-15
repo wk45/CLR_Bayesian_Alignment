@@ -1,0 +1,12 @@
+README.md
+pyproject.toml
+src/alg3/__init__.py
+src/alg3/clr_fallback.py
+src/alg3/inference.py
+src/alg3/modeling.py
+src/alg3_standalone.egg-info/PKG-INFO
+src/alg3_standalone.egg-info/SOURCES.txt
+src/alg3_standalone.egg-info/dependency_links.txt
+src/alg3_standalone.egg-info/requires.txt
+src/alg3_standalone.egg-info/top_level.txt
+tests/test_alg3_run.py
