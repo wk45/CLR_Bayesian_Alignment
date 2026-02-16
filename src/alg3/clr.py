@@ -1,11 +1,10 @@
 import numpy as np
-
-# Pure-Python fallback for CLR transforms (mirrors CLR.pyx).
+from numpy.typing import ArrayLike, NDArray
 
 _EPS = 1e-12
 
 
-def _cumtrapz_1d(y, x):
+def _cumtrapz_1d(y: ArrayLike, x: ArrayLike) -> NDArray[np.float64]:
     y = np.asarray(y, dtype=float)
     x = np.asarray(x, dtype=float)
     out = np.zeros_like(y, dtype=float)
@@ -14,7 +13,7 @@ def _cumtrapz_1d(y, x):
     return out
 
 
-def Psi_inv(h, t):
+def Psi_inv(h: ArrayLike, t: ArrayLike) -> NDArray[np.float64]:
     h = np.asarray(h, dtype=float)
     t = np.asarray(t, dtype=float)
     exp_h = np.exp(h)
@@ -25,13 +24,12 @@ def Psi_inv(h, t):
     return num / denom
 
 
-def Psi(gamma, t):
+def Psi(gamma: ArrayLike, t: ArrayLike) -> NDArray[np.float64]:
     gamma = np.asarray(gamma, dtype=float)
     t = np.asarray(t, dtype=float)
     gamma_dot = np.gradient(gamma, t)
     gamma_dot = np.maximum(gamma_dot, _EPS)
     log_gamma_dot = np.log(gamma_dot)
-    # CLR centering: subtract a scalar integral mean so that int Psi(gamma)(t) dt = 0.
     if hasattr(np, "trapezoid"):
         mean_log = np.trapezoid(log_gamma_dot, t)
     else:
@@ -39,7 +37,7 @@ def Psi(gamma, t):
     return log_gamma_dot - mean_log
 
 
-def Psi_batch(gamma_all, t):
+def Psi_batch(gamma_all: ArrayLike, t: ArrayLike) -> NDArray[np.float64]:
     gamma_all = np.asarray(gamma_all, dtype=float)
     t = np.asarray(t, dtype=float)
     num_obs, n = gamma_all.shape
@@ -49,7 +47,7 @@ def Psi_batch(gamma_all, t):
     return h_all
 
 
-def Psi_inv_batch(h_all, t):
+def Psi_inv_batch(h_all: ArrayLike, t: ArrayLike) -> NDArray[np.float64]:
     h_all = np.asarray(h_all, dtype=float)
     t = np.asarray(t, dtype=float)
     num_obs, n = h_all.shape

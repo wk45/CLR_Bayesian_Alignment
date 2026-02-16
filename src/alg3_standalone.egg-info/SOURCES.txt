@@ -1,7 +1,7 @@
 README.md
 pyproject.toml
 src/alg3/__init__.py
-src/alg3/clr_fallback.py
+src/alg3/clr.py
 src/alg3/inference.py
 src/alg3/modeling.py
 src/alg3_standalone.egg-info/PKG-INFO

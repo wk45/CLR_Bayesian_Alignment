@@ -14,7 +14,7 @@ from alg3 import run_alg3_chain
 
 
 class TestAlg3Run(unittest.TestCase):
-    def test_alg3_smoke_run(self):
+    def _run_chain(self, *, K: int, burn: int, thin: int, collect_traces: bool) -> dict[str, object]:
         data_path = ROOT / "data" / "data_st.npz"
         data = np.load(data_path, allow_pickle=True)
 
@@ -22,7 +22,7 @@ class TestAlg3Run(unittest.TestCase):
         y = data["y"][:8, :80]
         sig_y0 = float(data["sig_y0"])
 
-        out = run_alg3_chain(
+        return run_alg3_chain(
             y_local=y,
             t=t,
             ell_h=5.0,
@@ -31,7 +31,7 @@ class TestAlg3Run(unittest.TestCase):
             nu_g=1.0,
             cov_kernel_h="exp",
             cov_kernel_g="se",
-            K=30,
+            K=K,
             s2y=sig_y0 / 2.0,
             beta_h_choices=np.array([0.05, 0.1, 0.15], dtype=float),
             beta_g_choices=np.array([0.005, 0.01, 0.02], dtype=float),
@@ -39,21 +39,40 @@ class TestAlg3Run(unittest.TestCase):
             a_hyper={"mean": 0.0, "var": 0.1},
             c_hyper={"shape": 10.0, "scale": 0.1},
             seed=2,
-            burn=10,
-            thin=1,
-            collect_traces=True,
+            burn=burn,
+            thin=thin,
+            collect_traces=collect_traces,
             display_plots=False,
             verbose=False,
-            use_python=True,
         )
 
-        g = np.asarray(out["G"])
-        gamma_inv = np.asarray(out["GammaInv"])
+    def test_alg3_burn_and_thin_affect_trace_length(self) -> None:
+        out = self._run_chain(K=30, burn=10, thin=1, collect_traces=True)
 
-        self.assertEqual(g.shape, (30, 80))
-        self.assertEqual(gamma_inv.shape, (30, 8, 80))
+        g = np.asarray(out["G"])
+        gamma = np.asarray(out["Gamma"])
+        sse = np.asarray(out["SSE"])
+
+        self.assertIsInstance(out["G"], np.ndarray)
+        self.assertIsInstance(out["Gamma"], np.ndarray)
+        self.assertEqual(g.shape, (20, 80))
+        self.assertEqual(gamma.shape, (20, 8, 80))
+        self.assertEqual(sse.shape, (20,))
         self.assertTrue(np.isfinite(out["Acc_h_mean"]))
         self.assertTrue(np.isfinite(out["Acc_g_mean"]))
+
+    def test_alg3_collect_traces_false_omits_heavy_traces(self) -> None:
+        out = self._run_chain(K=24, burn=8, thin=4, collect_traces=False)
+
+        g = np.asarray(out["G"])
+        gamma = np.asarray(out["Gamma"])
+        f = np.asarray(out["F"])
+        sse = np.asarray(out["SSE"])
+
+        self.assertEqual(g.shape, (0, 80))
+        self.assertEqual(gamma.shape, (0, 8, 80))
+        self.assertEqual(f.shape, (0, 8, 80))
+        self.assertEqual(sse.shape, (4,))
 
 
 if __name__ == "__main__":

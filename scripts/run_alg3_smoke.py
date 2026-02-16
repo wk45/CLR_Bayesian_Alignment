@@ -4,7 +4,7 @@ import numpy as np
 from alg3 import run_alg3_chain
 
 
-def main():
+def main() -> None:
     root = Path(__file__).resolve().parents[1]
     data_path = root / "data" / "data_st.npz"
     data = np.load(data_path, allow_pickle=True)
@@ -36,14 +36,13 @@ def main():
         collect_traces=True,
         display_plots=False,
         verbose=False,
-        use_python=True,
     )
 
     g = np.asarray(out["G"])
-    gam = np.asarray(out["GammaInv"])
+    gamma = np.asarray(out["Gamma"])
     print("Alg3 smoke run complete")
     print("G shape:", g.shape)
-    print("Gamma shape:", gam.shape)
+    print("Gamma shape:", gamma.shape)
     print("Acc_h_mean:", out.get("Acc_h_mean"))
     print("Acc_g_mean:", out.get("Acc_g_mean"))
 
