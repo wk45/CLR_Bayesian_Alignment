@@ -1,26 +1,43 @@
-# alg3_standalone
+# CLR Bayesian Alignment
 
-`section2.4.1_st_v3.ipynb`에서 사용한 Alg3 MCMC 코드를 독립 실행 가능 형태로 복사한 폴더입니다.
+This repository contains a standalone implementation of the CLR Bayesian alignment workflow,
+focused on **Section 2.4.2, Algorithm 3**.
 
-변경 이력은 `UPDATE_LOG.md`에 누적합니다.
+Change history is maintained in `UPDATE_LOG.md`.
 
-## Included
+## Manuscript Status
 
-- `src/alg3/inference.py`: Alg3/Alg4 MCMC core
-- `src/alg3/modeling.py`: covariance/data helper
-- `src/alg3/clr.py`: pure Python CLR transforms
-- `data/data_st.npz`: smoke test용 데이터 복사본
-- `scripts/run_alg3_smoke.py`: 최소 실행 검증 스크립트
-- `scripts/run_scale_bench.py`: 스케일(중간/대형) 벤치 스크립트
+The related manuscript is currently **under review at CSDA**.
 
-## Quick start
+This repository provides implementation and reproducible experiments, but does not include
+full manuscript text.
+
+## Repository Contents
+
+- `src/alg3/inference.py`: Algorithm 3/4 MCMC core and wrappers
+- `src/alg3/modeling.py`: covariance and data helpers
+- `src/alg3/clr.py`: pure-Python CLR transform utilities
+- `data/data_st.npz`: sample dataset for smoke/benchmark tests
+- `scripts/run_alg3_smoke.py`: minimal execution check
+- `scripts/run_scale_bench.py`: scale benchmark (`--full`, `--stress`)
+- `tests/test_alg3_run.py`: regression tests for core runtime behavior
+
+## Installation
 
 ```bash
-cd alg3_standalone
 python -m pip install -e .
+```
+
+Optional acceleration:
+
+```bash
+python -m pip install numba
+```
+
+## Quick Start
+
+```bash
 python scripts/run_alg3_smoke.py
 python scripts/run_scale_bench.py --full
 python scripts/run_scale_bench.py --stress
 ```
-
-`numba`가 있으면 가속 가능하며, 없으면 pure Python 경로로 동작합니다.

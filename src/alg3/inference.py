@@ -5,7 +5,6 @@ from typing import Any
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
-import matplotlib.pyplot as plt
 try:
     from numba import jit
 except Exception:
@@ -1090,37 +1089,6 @@ def run_mcmc_alg4_numba(
             s_h, s_g, beta_h_choices, beta_g_choices)
 
 
-@jit(nopython=True)
-def compute_gamma_trace_numba(H_trace: NDArray[np.float64], t: NDArray[np.float64]) -> NDArray[np.float64]:
-    n_samp, n_obs, n_points = H_trace.shape
-    Gamma_trace = np.zeros((n_samp, n_obs, n_points), dtype=np.float64)
-    for i in range(n_samp):
-        for j in range(n_obs):
-            Gamma_trace[i, j, :] = Psi_inv_numba(H_trace[i, j, :], t)
-    return Gamma_trace
-
-@jit(nopython=True)
-def reconstruct_f_trace_numba(
-    A_trace: NDArray[np.float64],
-    C_trace: NDArray[np.float64],
-    G_trace: NDArray[np.float64],
-    Gamma_trace: NDArray[np.float64],
-    t: NDArray[np.float64],
-) -> NDArray[np.float64]:
-    n_samp, n_obs, n_points = Gamma_trace.shape
-    F_trace = np.zeros((n_samp, n_obs, n_points), dtype=np.float64)
-    
-    for k in range(n_samp):
-        g_k = G_trace[k]
-        for i in range(n_obs):
-            a_val = A_trace[k, i, 0]
-            c_val = C_trace[k, i, 0]
-            gam_vec = Gamma_trace[k, i, :]
-            g_warped = numba_interp(gam_vec, t, g_k)
-            F_trace[k, i, :] = a_val + c_val * g_warped
-            
-    return F_trace
-
 def _recover_g_old_from_traces(
     G_trace: NDArray[np.float64],
     C_trace: NDArray[np.float64],
@@ -1719,72 +1687,3 @@ def run_alg4_chain(
     if verbose:
         print("[Alg4 Numba] MCMC Done.")
     return res
-
-
-
-    if a_hyper is None:
-        a_hyper = {"mean": 0.0, "var": 1000.0}
-    if c_hyper is None:
-        c_hyper = {"shape": 10.0, "scale": 0.1}
-
-    if beta_h_choices is None or len(beta_h_choices) == 0:
-        r_local = np.array([0.999999, 0.99999, 0.9999, 0.999, 0.998, 0.995, 0.99, 0.985, 0.98], dtype=np.float64)
-        beta_local = np.sqrt(1.0 - r_local**2)
-        beta_h_choices = np.concatenate([beta_local, np.array([0.4], dtype=np.float64)])
-    if beta_g_choices is None or len(beta_g_choices) == 0:
-        r_local = np.array([0.999999, 0.99999, 0.9999, 0.999, 0.998, 0.995, 0.99, 0.985, 0.98], dtype=np.float64)
-        beta_local = np.sqrt(1.0 - r_local**2)
-        beta_g_choices = np.concatenate([beta_local, np.array([0.4], dtype=np.float64)])
-    use_beta_choices_h = True
-    use_beta_choices_g = True
-
-    if update_s2y:
-        print("[Alg4] update_s2y=True not supported in numba core; keeping s2y fixed.")
-
-    kernel_h = cov_kernel_h if cov_kernel_h is not None else "se"
-    kernel_g = cov_kernel_g if cov_kernel_g is not None else "se"
-    if verbose:
-        print(f"{'='*30} MCMC Hyperparameters {'='*30}")
-        print(f" > Data: Shape={y_local.shape}, Range=[{t[0]:.2f}, {t[-1]:.2f}]")
-        print(f" > MCMC Config: K={K}, Burn={burn}, Thin={thin}, Seed={seed}")
-        print(f" > Noise: s2y={s2y:.5f} (Fixed)")
-        print(f" > Kernel h: type={kernel_h}, ell_h={ell_h:.4f}, nu_h={nu_h:.4f}")
-        print(f" > Kernel g: type={kernel_g}, ell_g={ell_g:.4f}, nu_g={nu_g:.4f}")
-        print(f" > Prior a: N(mean={a_hyper['mean']}, var={a_hyper['var']})")
-        print(f" > Prior c: Gamma(shape={c_hyper['shape']}, scale={c_hyper['scale']})")
-        print(f" > No c/a: {bool(no_ca)}")
-        if beta_adapt:
-            print(f" > Beta sampling: random choices (RM adapt enabled)")
-            print(f" > Beta adapt: n_adapt={beta_n_adapt}, window={beta_window}, target_h={beta_acc_target_h}, target_g={beta_acc_target_g}")
-        else:
-            print(f" > Beta sampling: random choices (adaptive disabled)")
-        print(f"{'='*80}")
-    try:
-        _, Lh = compute_covariance(t, nu_h, ell_h, kernel_h)
-        _, Lg = compute_covariance(t, nu_g, ell_g, kernel_g)
-    except NameError:
-        print("[Warning] compute_covariance not found. Using simple RBF.")
-        from scipy.linalg import cholesky
-        dists = (t[:, None] - t[None, :])**2
-        Ch = nu_h * np.exp(-dists/(ell_h+1e-9)) + 1e-6*np.eye(len(t))
-        Lh = cholesky(Ch, lower=True)
-        Cg = nu_g * np.exp(-dists/(ell_g+1e-9)) + 1e-6*np.eye(len(t))
-        Lg = cholesky(Cg, lower=True)
-
-    Lh = Lh.astype(np.float64)
-    Lg = Lg.astype(np.float64)
-
-    if h_init is None:
-        h = np.zeros((num_obs, num_points), dtype=np.float64)
-    else:
-        h = np.asarray(h_init, dtype=np.float64).copy()
-
-    if g_init is None:
-        g = np.zeros(num_points, dtype=np.float64)
-    else:
-        g = np.asarray(g_init, dtype=np.float64).copy()
-
-    if a_init is None:
-        a = np.zeros(num_obs, dtype=np.float64)
-    else:
-        a = np.asarray(a_init, dtype=np.float64).reshape(-1).copy()

@@ -114,6 +114,15 @@ Rule: after each meaningful change, append a new dated entry with:
 - Preserved markdown/code cell order and notebook metadata (`python3` kernelspec).
 - Validated generated notebook JSON structure.
 
+## 2026-02-16 (README language and positioning update)
+
+### README rewrite
+- Rewrote `README.md` in English.
+- Updated project naming to `CLR Bayesian Alignment`.
+- Explicitly stated scope as **Section 2.4.2, Algorithm 3**.
+- Added manuscript status note: currently under review at CSDA.
+- Clarified that the repository provides implementation/reproducibility material, not full manuscript text.
+
 ## 2026-02-16 (repo readiness audit)
 
 ### Distribution checks
