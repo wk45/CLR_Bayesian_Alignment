@@ -180,3 +180,31 @@ Rule: after each meaningful change, append a new dated entry with:
 - `python scripts/generate_data_st.py`
 - `python -m unittest discover -s tests -v` (all passed)
 - smoke check for updated plotting logic: shapes/correlation validated without errors.
+
+## 2026-02-16 (template plot simplification)
+
+### Notebook visualization tweak
+- Updated `../template.ipynb` plotting cell:
+- Removed the middle observation-space panel from the 3-panel figure.
+- Kept a 2-panel view: `Before` + `Alignment Check in Template Space`.
+- In the final `Estimated G vs g_true` plot, added lightly drawn aligned posterior `f` curves.
+- Removed `g_true` peaks/valleys markers from the final plot.
+
+## 2026-02-16 (dataset generator switched to section2.4.1 v3 recipe)
+
+### Data generation change
+- Replaced `scripts/generate_data_st.py` logic with the same recipe used in `section2.4.1_st_data.ipynb`.
+- Key settings now match v3 recipe:
+- `seed=42`, `num_obs=10`, `num_points=200`, `sig_y0=0.2`, `t in [0,1]`.
+- `g_true` is generated from the 3-bump construction used in v3.
+- Warpings are generated via `generate_random_warpings(t, -1.5, 1.5, num_obs)`.
+
+### Notation clarification
+- Kept v3-compatible notation explicitly:
+- stored `gamma0` is the warping array used directly in `f_i(t)=g_true(gamma0_i(t))` via `np.interp(gamma0[i], t, g_true)`.
+- Added comments to avoid confusion with inverse-warp notation.
+
+### Validation run
+- `python scripts/generate_data_st.py`
+- `python scripts/run_alg3_smoke.py`
+- `python -m unittest discover -s tests -v`
