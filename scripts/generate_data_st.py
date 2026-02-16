@@ -21,7 +21,7 @@ def main() -> None:
     rng = np.random.default_rng(seed)
 
     num_obs = 10
-    num_points = 200
+    num_points = 150
     t = np.linspace(0.0, 1.0, num_points, dtype=np.float64)
 
     # Peaky/valley-rich underlying signal for clearer visual demos.
@@ -54,7 +54,9 @@ def main() -> None:
         gamma_i = (gamma_i - gamma_i[0]) / (gamma_i[-1] - gamma_i[0] + 1e-12)
         gamma_all[i] = gamma_i
 
-        f_true_i = a_true[i] + c_true[i] * np.interp(gamma_i, t, g_true)
+        # Keep generator consistent with inference model:
+        # f_i(t) = a_i + c_i * g(gamma_i^{-1}(t))
+        f_true_i = a_true[i] + c_true[i] * np.interp(t, gamma_i, g_true)
         f_true[i] = f_true_i
         y[i] = f_true_i + rng.normal(loc=0.0, scale=sig_y0, size=num_points)
 
