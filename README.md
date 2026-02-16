@@ -20,6 +20,7 @@ full manuscript text.
 - `data/data_st.npz`: sample dataset for smoke/benchmark tests
 - `scripts/run_alg3_smoke.py`: minimal execution check
 - `scripts/run_scale_bench.py`: scale benchmark (`--full`, `--stress`)
+- `scripts/generate_data_st.py`: regenerate demo dataset with peaky/valley-rich `g_true`
 - `tests/test_alg3_run.py`: regression tests for core runtime behavior
 
 ## Installation
@@ -40,4 +41,5 @@ python -m pip install numba
 python scripts/run_alg3_smoke.py
 python scripts/run_scale_bench.py --full
 python scripts/run_scale_bench.py --stress
+python scripts/generate_data_st.py
 ```
