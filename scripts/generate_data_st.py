@@ -61,8 +61,13 @@ def main() -> None:
         g_true=g_true,
         f_true=f_true,
         gamma0=gamma0,
+        # Keep both names for notation compatibility.
+        # a_true/c_true: existing key names
+        # ai_true/ci_true: explicit indexed notation aliases
         a_true=a_true,
         c_true=c_true,
+        ai_true=a_true,
+        ci_true=c_true,
         sig_y0=np.float64(sig_y0),
         num_obs=np.int64(num_obs),
         num_points=np.int64(num_points),
